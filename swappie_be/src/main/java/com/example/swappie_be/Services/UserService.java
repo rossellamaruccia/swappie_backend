@@ -38,4 +38,10 @@ public class UserService {
         if (op.isPresent()) return op.get();
         else throw new NotFoundException("Email non registrata.");
     }
+
+    public User findByIdWithItems(UUID id) {
+        Optional<User> op = this.userRepo.findByIdWithItems(id);
+        if (op.isPresent()) return op.get();
+        else throw new NotFoundException("Utente non trovato.");
+    }
 }
