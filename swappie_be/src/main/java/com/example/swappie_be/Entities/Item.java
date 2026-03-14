@@ -1,6 +1,5 @@
 package com.example.swappie_be.Entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +19,8 @@ public class Item {
     private long id;
     private String title;
     private String description;
+    @ElementCollection
     private List<String> pics = new ArrayList<>();
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

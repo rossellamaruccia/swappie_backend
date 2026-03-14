@@ -27,7 +27,7 @@ public class AccountController {
         if (user == null) {
             throw new UnauthorizedException("Log in again");
         } else {
-            return this.userService.findByIdWithItems(user.getId());
+            return this.userService.findById(user.getId());
         }
     }
 }
