@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,4 +14,6 @@ import java.util.UUID;
 public interface ItemRepo extends JpaRepository<Item, Long> {
     @Query("SELECT i FROM Item i LEFT JOIN FETCH i.user WHERE user.id = :id")
     Optional<Item> findItemsPerUser(@Param("id") UUID id);
+
+    Optional<ArrayList<Item>> findAllByUserId(UUID user_id);
 }

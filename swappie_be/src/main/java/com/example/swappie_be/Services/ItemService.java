@@ -3,6 +3,7 @@ package com.example.swappie_be.Services;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.swappie_be.Entities.Item;
 import com.example.swappie_be.Entities.User;
+import com.example.swappie_be.Exceptions.NotFoundException;
 import com.example.swappie_be.Payloads.ItemDTO;
 import com.example.swappie_be.Repositories.ItemRepo;
 import com.example.swappie_be.config.CloudinaryConfig;
@@ -11,9 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ItemService {
@@ -48,5 +47,11 @@ public class ItemService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload file to Cloudinary", e);
         }
+    }
+
+    public ArrayList<Item> findItemsPerUserId(UUID user_id) {
+        Optional<ArrayList<Item>> optional = this.itemRepo.findAllByUserId(user_id);
+        if (optional.isPresent()) return optional.get();
+        else throw new NotFoundException(user_id);
     }
 }

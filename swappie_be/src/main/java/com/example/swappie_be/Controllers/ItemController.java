@@ -15,7 +15,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/items")
@@ -49,4 +51,10 @@ public class ItemController {
 
         return this.itemService.save(payload, user, files);
     }
+
+    @GetMapping("")
+    public ArrayList<Item> getItemsPerUser(@RequestParam(name = "user") String user_id) {
+        return this.itemService.findItemsPerUserId(UUID.fromString(user_id));
+    }
+
 }
