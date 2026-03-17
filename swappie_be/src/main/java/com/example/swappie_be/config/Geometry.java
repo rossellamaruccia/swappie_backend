@@ -12,9 +12,10 @@ public class Geometry {
     public GeometryFactory geometryFactory() {
         return new GeometryFactory(new PrecisionModel(), 4326);
     }
-    
+
     public Point createPoint(Double latitude, Double longitude) {
-        return geometryFactory().createPoint(new Coordinate(longitude, latitude));
+        Point point = geometryFactory().createPoint(new Coordinate(longitude, latitude));
+        return point;
     }
 
 

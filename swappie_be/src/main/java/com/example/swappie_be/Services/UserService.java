@@ -6,6 +6,7 @@ import com.example.swappie_be.Exceptions.NotFoundException;
 import com.example.swappie_be.Payloads.UserDTO;
 import com.example.swappie_be.Repositories.UserRepo;
 import com.example.swappie_be.config.CloudinaryConfig;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,9 +31,10 @@ public class UserService {
         this.cloudinaryConfig = config;
     }
 
-    public User save(UserDTO payload) {
+    public void save(UserDTO payload, Point userPoint) {
         User newUser = new User(payload.name(), payload.surname(), payload.email(), passwordEncoder.encode(payload.password()), payload.city());
-        return this.userRepo.save(newUser);
+        newUser.setLocation(userPoint);
+        this.userRepo.save(newUser);
     }
 
     public User findById(UUID id) {

@@ -5,5 +5,6 @@ public record UserDTO(
         String surname,
         String email,
         String password,
-        String city) {
+        String city,
+        LocationDTO location) {
 }

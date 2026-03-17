@@ -19,8 +19,16 @@ public interface ItemRepo extends JpaRepository<Item, Long> {
 
     Optional<ArrayList<Item>> findAllByUserId(UUID user_id);
 
-    @Query(value = "SELECT * FROM items i WHERE ST_DWithin(i.location, :userLocation, :radiusInMeters)",
-            nativeQuery = true)
-    List<Item> findItemsNear(@Param("userLocation") Point userLocation,
-                             @Param("radiusInMeters") double radiusInMeters);
+    @Query(value = """
+            SELECT *, 
+                   ST_Distance(location, :userLocation) as distance_meters
+            FROM items
+            WHERE ST_DWithin(location, :userLocation, :radiusInMeters)
+            ORDER BY distance_meters ASC
+            """, nativeQuery = true)
+    List<Item> findItemsNear(
+            @Param("userLocation") Point userLocation,
+            @Param("radiusInMeters") double radiusInMeters
+    );
+
 }

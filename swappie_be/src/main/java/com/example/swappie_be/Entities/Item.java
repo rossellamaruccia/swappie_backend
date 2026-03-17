@@ -24,6 +24,8 @@ public class Item {
     private ItemType type;
     @Column(columnDefinition = "geography(Point, 4326)")
     private Point location;
+    @Transient
+    private Double distanceMeters;
     @ElementCollection
     private List<String> pics = new ArrayList<>();
     @ManyToOne

@@ -11,6 +11,7 @@ public record ItemDTO(
         String description,
         ItemType itemType,
         @Size(max = 5, message = "You cannot upload more than 5 images")
-        List<MultipartFile> files
+        List<MultipartFile> files,
+        LocationDTO location
 ) {
 }
