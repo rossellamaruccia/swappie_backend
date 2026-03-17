@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.locationtech.jts.geom.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,10 @@ public class Item {
     private long id;
     private String title;
     private String description;
+    @Enumerated(EnumType.STRING)
+    private ItemType type;
+    @Column(columnDefinition = "geography(Point, 4326)")
+    private Point location;
     @ElementCollection
     private List<String> pics = new ArrayList<>();
     @ManyToOne

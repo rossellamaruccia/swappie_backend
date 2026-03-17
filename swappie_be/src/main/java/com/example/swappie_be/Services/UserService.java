@@ -66,4 +66,17 @@ public class UserService {
             throw new RuntimeException("Failed to upload file to Cloudinary", e);
         }
     }
+
+    public User findByIdAndSetLocation(User user) {
+        Optional<User> op = this.userRepo.findById(user.getId());
+        try {
+            if (op.isPresent()) {
+                User found = op.get();
+                found.setLocation(user.getLocation());
+                return this.userRepo.save(found);
+            } else throw new NotFoundException(user.getId());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update your location", e);
+        }
+    }
 }

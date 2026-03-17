@@ -5,8 +5,10 @@ import com.example.swappie_be.Entities.User;
 import com.example.swappie_be.Exceptions.UnauthorizedException;
 import com.example.swappie_be.Exceptions.ValidationException;
 import com.example.swappie_be.Payloads.ItemDTO;
+import com.example.swappie_be.Payloads.LocationDTO;
 import com.example.swappie_be.Services.ItemService;
-import com.example.swappie_be.security.JWTTools;
+import com.example.swappie_be.config.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,17 +25,18 @@ import java.util.UUID;
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
-    private final JWTTools jwtTools;
+    private final Geometry geometry;
 
-    public ItemController(ItemService itemService, JWTTools jwtTools) {
+    public ItemController(ItemService itemService, Geometry geometry) {
         this.itemService = itemService;
-        this.jwtTools = jwtTools;
+        this.geometry = geometry;
     }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Item createNewItem(
             @AuthenticationPrincipal User user,
             @ModelAttribute @Validated ItemDTO payload,
+            @RequestBody LocationDTO location,
             @RequestParam("files") MultipartFile[] files,
             BindingResult validationResult
     ) {
@@ -49,7 +52,8 @@ public class ItemController {
             throw new UnauthorizedException("Log in again");
         }
 
-        return this.itemService.save(payload, user, files);
+        Point itemPoint = geometry.createPoint(location.lng(), location.lat());
+        return this.itemService.save(payload, user, files, itemPoint);
     }
 
     @GetMapping("")

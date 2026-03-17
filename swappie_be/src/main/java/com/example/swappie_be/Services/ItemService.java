@@ -7,6 +7,7 @@ import com.example.swappie_be.Exceptions.NotFoundException;
 import com.example.swappie_be.Payloads.ItemDTO;
 import com.example.swappie_be.Repositories.ItemRepo;
 import com.example.swappie_be.config.CloudinaryConfig;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +28,7 @@ public class ItemService {
         this.cloudinaryConfig = cloudinaryConfig;
     }
 
-    public Item save(ItemDTO payload, User user, MultipartFile[] files) {
+    public Item save(ItemDTO payload, User user, MultipartFile[] files, Point itemPoint) {
         List<String> imageUrls = new ArrayList<>();
         try {
             for (MultipartFile file : files) {
@@ -39,8 +40,10 @@ public class ItemService {
             Item item = new Item();
             item.setTitle(payload.title());
             item.setDescription(payload.description());
+            item.setType(payload.itemType());
             item.setPics(imageUrls);
             item.setUser(user);
+            item.setLocation(itemPoint);
 
             return itemRepo.save(item);
 

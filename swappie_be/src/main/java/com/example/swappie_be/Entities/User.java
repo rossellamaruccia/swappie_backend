@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.locationtech.jts.geom.Point;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,6 +34,8 @@ public class User implements UserDetails {
     private String password;
     private String city;
     private String profilePic;
+    @Column(columnDefinition = "geography(Point, 4326)")
+    private Point location;
 
     public User(String name, String surname, String email, String password, String city) {
         this.name = name;

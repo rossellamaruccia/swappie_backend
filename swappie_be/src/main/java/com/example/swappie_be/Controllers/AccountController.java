@@ -3,9 +3,11 @@ package com.example.swappie_be.Controllers;
 import com.example.swappie_be.Entities.User;
 import com.example.swappie_be.Exceptions.UnauthorizedException;
 import com.example.swappie_be.Exceptions.ValidationException;
+import com.example.swappie_be.Payloads.LocationDTO;
 import com.example.swappie_be.Payloads.UserDTO;
-import com.example.swappie_be.Services.AuthService;
 import com.example.swappie_be.Services.UserService;
+import com.example.swappie_be.config.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.MediaType;
@@ -20,12 +22,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class AccountController {
-    private final AuthService authService;
     private final UserService userService;
+    private final Geometry geometry;
 
     @Autowired
-    public AccountController(AuthService authService, UserService userService) {
-        this.authService = authService;
+    public AccountController(UserService userService, Geometry geometry) {
+        this.geometry = geometry;
         this.userService = userService;
     }
 
@@ -50,5 +52,12 @@ public class AccountController {
         if (user == null) {
             throw new UnauthorizedException("Log in again");
         } else return this.userService.findByIdAndUpdate(user.getId(), payload, profilePic);
+    }
+
+    @PostMapping("/locate")
+    public User receiveLocation(@AuthenticationPrincipal User user, @RequestBody LocationDTO location) {
+        Point userPoint = geometry.createPoint(location.lng(), location.lat());
+        user.setLocation(userPoint);
+        return this.userService.findByIdAndSetLocation(user);
     }
 }
