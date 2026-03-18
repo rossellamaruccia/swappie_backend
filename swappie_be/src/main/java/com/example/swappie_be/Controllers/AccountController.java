@@ -1,6 +1,7 @@
 package com.example.swappie_be.Controllers;
 
 import com.example.swappie_be.Entities.User;
+import com.example.swappie_be.Exceptions.BadRequestException;
 import com.example.swappie_be.Exceptions.UnauthorizedException;
 import com.example.swappie_be.Exceptions.ValidationException;
 import com.example.swappie_be.Payloads.LocationDTO;
@@ -9,6 +10,8 @@ import com.example.swappie_be.Payloads.UserGetResponseDTO;
 import com.example.swappie_be.Services.UserService;
 import com.example.swappie_be.config.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.MediaType;
@@ -23,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class AccountController {
+    private static final Logger log = LoggerFactory.getLogger(AccountController.class);
     private final UserService userService;
     private final Geometry geometry;
 
@@ -53,12 +57,7 @@ public class AccountController {
         if (user == null) {
             throw new UnauthorizedException("Log in again");
         }
-        if (payload.location() == null || payload.location().lng() == null || payload.location().lat() == null) {
-            this.userService.findByIdAndUpdate(user.getId(), payload);
-        } else {
-            Point userPoint = this.geometry.createPoint(payload.location().lng(), payload.location().lat());
-            this.userService.findByIdAndSetLocation(user, userPoint);
-            this.userService.findByIdAndUpdate(user.getId(), payload);
+        else this.userService.findByIdAndUpdate(user.getId(), payload);
         }
     }
 
@@ -72,9 +71,13 @@ public class AccountController {
         } else return this.userService.findByIdAndUpdateProfilePic(user.getId(), profilePic);
     }
 
-    @PostMapping("/locate")
+    @PutMapping("/me/edit/location")
     public void receiveLocation(@AuthenticationPrincipal User user, @RequestBody LocationDTO location) {
-        Point userPoint = geometry.createPoint(location.lng(), location.lat());
-        this.userService.findByIdAndSetLocation(user, userPoint);
+        if (location == null || location.lng() == null || location.lat() == null) {
+            throw new BadRequestException("Invalid geolocation");
+        } else {
+            Point userPoint = geometry.createPoint(location.lng(), location.lat());
+            this.userService.findByIdAndSetLocation(user, userPoint);
+        }
     }
 }

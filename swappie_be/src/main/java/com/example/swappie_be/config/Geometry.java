@@ -13,7 +13,7 @@ public class Geometry {
         return new GeometryFactory(new PrecisionModel(), 4326);
     }
 
-    public Point createPoint(Double latitude, Double longitude) {
+    public Point createPoint(Double longitude, Double latitude) {
         Point point = geometryFactory().createPoint(new Coordinate(longitude, latitude));
         return point;
     }
