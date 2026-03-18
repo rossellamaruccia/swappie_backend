@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/items")
@@ -57,8 +56,8 @@ public class ItemController {
     }
 
     @GetMapping("")
-    public ArrayList<Item> getItemsPerUser(@RequestParam(name = "user") String user_id) {
-        return this.itemService.findItemsPerUserId(UUID.fromString(user_id));
+    public ArrayList<Item> getItemsPerUser(@AuthenticationPrincipal User user) {
+        return this.itemService.findItemsPerUserId(user.getId());
     }
 
 }

@@ -5,6 +5,7 @@ import com.example.swappie_be.Exceptions.UnauthorizedException;
 import com.example.swappie_be.Exceptions.ValidationException;
 import com.example.swappie_be.Payloads.LocationDTO;
 import com.example.swappie_be.Payloads.UserDTO;
+import com.example.swappie_be.Payloads.UserGetResponseDTO;
 import com.example.swappie_be.Services.UserService;
 import com.example.swappie_be.config.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -32,16 +33,16 @@ public class AccountController {
     }
 
     @GetMapping("/me")
-    public User getCurrentUser(@AuthenticationPrincipal User user) {
+    public UserGetResponseDTO getCurrentUser(@AuthenticationPrincipal User user) {
         if (user == null) {
             throw new UnauthorizedException("Log in again");
         } else {
-            return this.userService.findById(user.getId());
+            return this.userService.findFlatUserById(user.getId());
         }
     }
 
-    @PutMapping(value = "/me/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public User getUserByIdAndUpdate(@AuthenticationPrincipal User user, @ModelAttribute @Validated UserDTO payload, MultipartFile profilePic, BindingResult validationResult) {
+    @PutMapping(value = "/me/edit")
+    public void getUserByIdAndUpdate(@AuthenticationPrincipal User user, @RequestBody @Validated UserDTO payload, BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             List<String> errorList = validationResult.getFieldErrors()
                     .stream()
@@ -51,13 +52,29 @@ public class AccountController {
         }
         if (user == null) {
             throw new UnauthorizedException("Log in again");
-        } else return this.userService.findByIdAndUpdate(user.getId(), payload, profilePic);
+        }
+        if (payload.location() == null || payload.location().lng() == null || payload.location().lat() == null) {
+            this.userService.findByIdAndUpdate(user.getId(), payload);
+        } else {
+            Point userPoint = this.geometry.createPoint(payload.location().lng(), payload.location().lat());
+            this.userService.findByIdAndSetLocation(user, userPoint);
+            this.userService.findByIdAndUpdate(user.getId(), payload);
+        }
+    }
+
+    @PutMapping(value = "/me/edit/profile_pic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String getUserByIdAndUpdateProfilePic(@AuthenticationPrincipal User user, @RequestParam("profilePic") MultipartFile profilePic) {
+        if (user == null) {
+            throw new UnauthorizedException("Log in again");
+        }
+        if (profilePic.isEmpty()) {
+            throw new ValidationException(List.of("Profile picture cannot be empty"));
+        } else return this.userService.findByIdAndUpdateProfilePic(user.getId(), profilePic);
     }
 
     @PostMapping("/locate")
-    public User receiveLocation(@AuthenticationPrincipal User user, @RequestBody LocationDTO location) {
+    public void receiveLocation(@AuthenticationPrincipal User user, @RequestBody LocationDTO location) {
         Point userPoint = geometry.createPoint(location.lng(), location.lat());
-        user.setLocation(userPoint);
-        return this.userService.findByIdAndSetLocation(user);
+        this.userService.findByIdAndSetLocation(user, userPoint);
     }
 }
