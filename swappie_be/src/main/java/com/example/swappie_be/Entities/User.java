@@ -36,6 +36,8 @@ public class User implements UserDetails {
     private String profilePic;
     @Column(columnDefinition = "geography(Point, 4326)")
     private Point location;
+    @Transient
+    private Double distanceMeters;
 
     public User(String name, String surname, String email, String password, String city) {
         this.name = name;

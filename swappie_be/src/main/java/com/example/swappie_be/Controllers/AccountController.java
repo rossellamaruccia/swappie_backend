@@ -56,10 +56,9 @@ public class AccountController {
         }
         if (user == null) {
             throw new UnauthorizedException("Log in again");
-        }
-        else this.userService.findByIdAndUpdate(user.getId(), payload);
-        }
+        } else this.userService.findByIdAndUpdate(user.getId(), payload);
     }
+
 
     @PutMapping(value = "/me/edit/profile_pic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String getUserByIdAndUpdateProfilePic(@AuthenticationPrincipal User user, @RequestParam("profilePic") MultipartFile profilePic) {

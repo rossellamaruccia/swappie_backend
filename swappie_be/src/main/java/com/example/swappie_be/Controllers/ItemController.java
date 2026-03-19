@@ -1,14 +1,11 @@
 package com.example.swappie_be.Controllers;
 
-import com.example.swappie_be.Entities.Item;
 import com.example.swappie_be.Entities.User;
 import com.example.swappie_be.Exceptions.UnauthorizedException;
 import com.example.swappie_be.Exceptions.ValidationException;
 import com.example.swappie_be.Payloads.ItemDTO;
-import com.example.swappie_be.Payloads.LocationDTO;
+import com.example.swappie_be.Payloads.ItemGetResponseDTO;
 import com.example.swappie_be.Services.ItemService;
-import com.example.swappie_be.config.Geometry;
-import org.locationtech.jts.geom.Point;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,20 +21,17 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
-    private final Geometry geometry;
 
-    public ItemController(ItemService itemService, Geometry geometry) {
+    public ItemController(ItemService itemService) {
         this.itemService = itemService;
-        this.geometry = geometry;
     }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Item createNewItem(
+    public void createNewItem(
             @AuthenticationPrincipal User user,
             @ModelAttribute @Validated ItemDTO payload,
-            @RequestBody LocationDTO location,
-            @RequestParam("files") MultipartFile[] files,
-            BindingResult validationResult
+            BindingResult validationResult,
+            @RequestParam("files") MultipartFile[] files
     ) {
         if (validationResult.hasErrors()) {
             List<String> errorList = validationResult.getFieldErrors()
@@ -51,12 +45,11 @@ public class ItemController {
             throw new UnauthorizedException("Log in again");
         }
 
-        Point itemPoint = geometry.createPoint(location.lng(), location.lat());
-        return this.itemService.save(payload, user, files, itemPoint);
+        this.itemService.save(payload, user, files);
     }
 
     @GetMapping("")
-    public ArrayList<Item> getItemsPerUser(@AuthenticationPrincipal User user) {
+    public ArrayList<ItemGetResponseDTO> getItemsPerUser(@AuthenticationPrincipal User user) {
         return this.itemService.findItemsPerUserId(user.getId());
     }
 

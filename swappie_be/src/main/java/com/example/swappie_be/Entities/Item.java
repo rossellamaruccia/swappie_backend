@@ -32,10 +32,11 @@ public class Item {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Item(String title, String description, List<String> pics, User user) {
+    public Item(String title, String description, List<String> pics, ItemType type, User user) {
         this.title = title;
         this.description = description;
         this.pics = pics;
+        this.type = type;
         this.user = user;
     }
 }
