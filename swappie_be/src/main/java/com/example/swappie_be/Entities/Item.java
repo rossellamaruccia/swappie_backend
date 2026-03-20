@@ -1,10 +1,10 @@
 package com.example.swappie_be.Entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.locationtech.jts.geom.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,16 +20,24 @@ public class Item {
     private long id;
     private String title;
     private String description;
+    @Enumerated(EnumType.STRING)
+    private ItemType type;
+    private Category category;
+    @Column(columnDefinition = "geography(Point, 4326)")
+    private Point location;
+    @Transient
+    private Double distanceMeters;
+    @ElementCollection
     private List<String> pics = new ArrayList<>();
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Item(String title, String description, List<String> pics, User user) {
+    public Item(String title, String description, List<String> pics, ItemType type, User user) {
         this.title = title;
         this.description = description;
         this.pics = pics;
+        this.type = type;
         this.user = user;
     }
 }

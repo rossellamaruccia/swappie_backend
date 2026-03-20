@@ -1,7 +1,9 @@
 package com.example.swappie_be.security;
 
 import com.example.swappie_be.Entities.User;
+import com.example.swappie_be.Exceptions.NotFoundException;
 import com.example.swappie_be.Exceptions.UnauthorizedException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +25,19 @@ public class JWTTools {
                 .subject(String.valueOf(user.getId()))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
+    }
+
+    public UUID getIdFromToken(String token) {
+        try {
+            Claims claims = Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            
+            return UUID.fromString(claims.getSubject());
+        } catch (Exception e) {
+            throw new NotFoundException("User not found or token invalid");
+        }
     }
 
     public void verifyToken(String token) {

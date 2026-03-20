@@ -40,7 +40,6 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
             User authUser = this.userService.findById(jwtTools.getId(accessToken));
             Authentication authentication = new UsernamePasswordAuthenticationToken(authUser, null, authUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            filterChain.doFilter(request, response);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Token verification failed: " + e.getMessage());

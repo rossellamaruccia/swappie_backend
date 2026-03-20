@@ -1,10 +1,10 @@
 package com.example.swappie_be.Payloads;
 
-public record UserDTO(
+public record UserGetResponseDTO(
         String name,
         String surname,
         String email,
-        String password,
         String city,
+        String profilePic,
         LocationDTO location) {
 }
