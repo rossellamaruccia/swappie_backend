@@ -40,6 +40,7 @@ public class ItemService {
             item.setTitle(payload.title());
             item.setDescription(payload.description());
             item.setType(payload.itemType());
+            item.setCategory(payload.category());
             item.setPics(imageUrls);
             item.setUser(user);
             item.setLocation(user.getLocation());
@@ -60,6 +61,7 @@ public class ItemService {
                             item.getTitle(),
                             item.getDescription(),
                             item.getType(),
+                            item.getCategory(),
                             item.getUser().getId(),
                             item.getPics(),
                             item.getLocation().getX(),
@@ -69,4 +71,22 @@ public class ItemService {
         } else throw new NotFoundException(user_id);
     }
 
+    public List<ItemGetResponseDTO> findAllItems(User user) {
+        List<Item> allItemsList = this.itemRepo.findAll();
+        List<ItemGetResponseDTO> allGetResponseItemsList = allItemsList.stream()
+                .map(item -> new ItemGetResponseDTO(
+                        item.getId(),
+                        item.getTitle(),
+                        item.getDescription(),
+                        item.getType(),
+                        item.getCategory(),
+                        item.getUser().getId(),
+                        item.getPics(),
+                        item.getLocation().getX(),
+                        item.getLocation().getY()
+                ))
+                .collect(Collectors.toCollection(ArrayList::new));
+        allGetResponseItemsList.removeIf((item -> user.getId().equals(item.user_id())));
+        return allGetResponseItemsList;// questa funzione deve ritornare tutti gli item tranne quelli dell'user che fa la richiesta
+    }
 }

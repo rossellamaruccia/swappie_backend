@@ -22,6 +22,7 @@ public class Item {
     private String description;
     @Enumerated(EnumType.STRING)
     private ItemType type;
+    private Category category;
     @Column(columnDefinition = "geography(Point, 4326)")
     private Point location;
     @Transient

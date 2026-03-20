@@ -1,5 +1,6 @@
 package com.example.swappie_be.Payloads;
 
+import com.example.swappie_be.Entities.Category;
 import com.example.swappie_be.Entities.ItemType;
 
 import java.util.List;
@@ -10,6 +11,7 @@ public record ItemGetResponseDTO(
         String title,
         String description,
         ItemType type,
+        Category category,
         UUID user_id,
         List<String> pics_urls,
         double lng,

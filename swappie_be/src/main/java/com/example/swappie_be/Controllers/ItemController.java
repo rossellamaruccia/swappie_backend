@@ -53,4 +53,9 @@ public class ItemController {
         return this.itemService.findItemsPerUserId(user.getId());
     }
 
+    @GetMapping("/feed")
+    public List<ItemGetResponseDTO> findAllItems(@AuthenticationPrincipal User user) {
+        return this.itemService.findAllItems(user);
+    }
+
 }
