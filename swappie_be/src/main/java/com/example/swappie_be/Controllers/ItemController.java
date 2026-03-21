@@ -1,5 +1,6 @@
 package com.example.swappie_be.Controllers;
 
+import com.example.swappie_be.Entities.Category;
 import com.example.swappie_be.Entities.User;
 import com.example.swappie_be.Exceptions.UnauthorizedException;
 import com.example.swappie_be.Exceptions.ValidationException;
@@ -54,8 +55,13 @@ public class ItemController {
     }
 
     @GetMapping("/feed")
-    public List<ItemGetResponseDTO> findAllItems(@AuthenticationPrincipal User user) {
-        return this.itemService.findAllItems(user);
+    public List<ItemGetResponseDTO> findAllItems(@AuthenticationPrincipal User user,
+                                                 @RequestParam(name = "category", required = false) Category category) {
+        if (category != null) {
+            return itemService.findAllByCategory(user, category);
+        } else {
+            return itemService.findAllItems(user);
+        }
     }
 
 }

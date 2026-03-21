@@ -1,6 +1,7 @@
 package com.example.swappie_be.Services;
 
 import com.cloudinary.utils.ObjectUtils;
+import com.example.swappie_be.Entities.Category;
 import com.example.swappie_be.Entities.Item;
 import com.example.swappie_be.Entities.User;
 import com.example.swappie_be.Exceptions.NotFoundException;
@@ -88,5 +89,21 @@ public class ItemService {
                 .collect(Collectors.toCollection(ArrayList::new));
         allGetResponseItemsList.removeIf((item -> user.getId().equals(item.user_id())));
         return allGetResponseItemsList;// questa funzione deve ritornare tutti gli item tranne quelli dell'user che fa la richiesta
+    }
+
+    public List<ItemGetResponseDTO> findAllByCategory(User user, Category category) {
+        return this.itemRepo.findAvailableItemsByCategory(user.getId(), category).stream()
+                .map(item -> new ItemGetResponseDTO(
+                        item.getId(),
+                        item.getTitle(),
+                        item.getDescription(),
+                        item.getType(),
+                        item.getCategory(),
+                        item.getUser().getId(),
+                        item.getPics(),
+                        item.getLocation().getX(),
+                        item.getLocation().getY()
+                ))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }

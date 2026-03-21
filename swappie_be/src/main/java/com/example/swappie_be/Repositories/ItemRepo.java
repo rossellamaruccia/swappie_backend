@@ -1,5 +1,6 @@
 package com.example.swappie_be.Repositories;
 
+import com.example.swappie_be.Entities.Category;
 import com.example.swappie_be.Entities.Item;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,10 +15,14 @@ import java.util.UUID;
 
 @Repository
 public interface ItemRepo extends JpaRepository<Item, Long> {
-    @Query("SELECT i FROM Item i LEFT JOIN FETCH i.user WHERE user.id = :id")
-    Optional<Item> findItemsPerUser(@Param("id") UUID id);
+
+//    @Query("SELECT i FROM Item i LEFT JOIN FETCH i.user WHERE user.id = :id")
+//    Optional<Item> findItemsPerUser(@Param("id") UUID id);
 
     Optional<ArrayList<Item>> findAllByUserId(UUID user_id);
+
+    @Query("SELECT i FROM Item i WHERE i.user.id <> :userId AND i.category = :category")
+    List<Item> findAvailableItemsByCategory(@Param("userId") UUID userId, @Param("category") Category category);
 
     @Query(value = """
             SELECT *, 
