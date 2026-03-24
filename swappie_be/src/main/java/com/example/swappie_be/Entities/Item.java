@@ -22,12 +22,12 @@ public class Item {
     private String description;
     @Enumerated(EnumType.STRING)
     private ItemType type;
+    @Enumerated(EnumType.STRING)
     private Category category;
     @Column(columnDefinition = "geography(Point, 4326)")
     private Point location;
     @Transient
     private Double distanceMeters;
-    @ElementCollection
     private List<String> pics = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

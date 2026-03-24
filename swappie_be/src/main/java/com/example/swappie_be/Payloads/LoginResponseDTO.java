@@ -1,4 +1,6 @@
 package com.example.swappie_be.Payloads;
 
-public record LoginResponseDTO(String accessToken) {
+import java.util.UUID;
+
+public record LoginResponseDTO(String accessToken, UUID id) {
 }

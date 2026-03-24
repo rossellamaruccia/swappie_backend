@@ -1,5 +1,6 @@
 package com.example.swappie_be.Controllers;
 
+import com.example.swappie_be.Entities.Category;
 import com.example.swappie_be.Entities.User;
 import com.example.swappie_be.Exceptions.UnauthorizedException;
 import com.example.swappie_be.Exceptions.ValidationException;
@@ -53,9 +54,39 @@ public class ItemController {
         return this.itemService.findItemsPerUserId(user.getId());
     }
 
-    @GetMapping("/feed")
-    public List<ItemGetResponseDTO> findAllItems(@AuthenticationPrincipal User user) {
-        return this.itemService.findAllItems(user);
+    @GetMapping("/details")
+    public ItemGetResponseDTO getItemDetails(@AuthenticationPrincipal User user, @RequestParam(name = "id", required = false) long itemID) {
+        return itemService.findItemById(itemID);
     }
 
+    @GetMapping("/feed")
+    public List<ItemGetResponseDTO> findAllItems(@AuthenticationPrincipal User user,
+                                                 @RequestParam(name = "category", required = false) Category category) {
+        if (category != null) {
+            return itemService.findAllByCategory(user, category);
+        } else {
+            return itemService.findAllItems(user);
+        }
+    }
+
+    @PostMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void editItem(@AuthenticationPrincipal User user,
+                         @RequestParam(name = "id", required = false) long itemID,
+                         @ModelAttribute @Validated ItemDTO payload,
+                         BindingResult validationResult,
+                         @RequestParam("files") MultipartFile[] files) {
+        if (validationResult.hasErrors()) {
+            List<String> errorList = validationResult.getFieldErrors()
+                    .stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .toList();
+            throw new ValidationException(errorList);
+        }
+
+        if (user == null) {
+            throw new UnauthorizedException("Log in again");
+        }
+
+        this.itemService.editItem(payload, itemID, user.getId(), files);
+    }
 }

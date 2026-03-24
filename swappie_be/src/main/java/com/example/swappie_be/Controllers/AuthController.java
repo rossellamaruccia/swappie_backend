@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -35,7 +36,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public LoginResponseDTO login(@RequestBody LoginDTO body) {
-        return new LoginResponseDTO(this.authService.checkCredentialAndGenerateToken(body));
+        String accessToken = this.authService.checkCredentialAndGenerateToken(body);
+        UUID id = this.userService.returnID(body.email());
+        return new LoginResponseDTO(accessToken, id);
     }
 
     @PostMapping("/register")
