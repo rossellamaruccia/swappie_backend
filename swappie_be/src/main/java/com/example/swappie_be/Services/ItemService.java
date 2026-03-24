@@ -5,6 +5,7 @@ import com.example.swappie_be.Entities.Category;
 import com.example.swappie_be.Entities.Item;
 import com.example.swappie_be.Entities.User;
 import com.example.swappie_be.Exceptions.NotFoundException;
+import com.example.swappie_be.Exceptions.UnauthorizedException;
 import com.example.swappie_be.Payloads.ItemDTO;
 import com.example.swappie_be.Payloads.ItemGetResponseDTO;
 import com.example.swappie_be.Repositories.ItemRepo;
@@ -52,6 +53,30 @@ public class ItemService {
         }
     }
 
+    public void editItem(ItemDTO payload, long itemID, UUID userID, MultipartFile[] files) {
+        List<String> imageUrls = new ArrayList<>();
+        try {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    Map uploadResult = cloudinaryConfig.cloudinary().uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
+                    imageUrls.add((String) uploadResult.get("secure_url"));
+                }
+            }
+            Item item = this.itemRepo.findById(itemID).orElseThrow();
+            if (item.getUser().getId().equals(userID)) {
+                item.setTitle(payload.title());
+                item.setDescription(payload.description());
+                item.setType(payload.itemType());
+                item.setCategory(payload.category());
+                item.setPics(imageUrls);
+                this.itemRepo.save(item);
+            } else throw new UnauthorizedException("You cannot edit this item");
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload file to Cloudinary", e);
+        }
+    }
+
     public ArrayList<ItemGetResponseDTO> findItemsPerUserId(UUID user_id) {
         Optional<ArrayList<Item>> optional = this.itemRepo.findAllByUserId(user_id);
         if (optional.isPresent()) {
@@ -89,6 +114,13 @@ public class ItemService {
                 .collect(Collectors.toCollection(ArrayList::new));
         allGetResponseItemsList.removeIf((item -> user.getId().equals(item.user_id())));
         return allGetResponseItemsList;// questa funzione deve ritornare tutti gli item tranne quelli dell'user che fa la richiesta
+    }
+
+    public ItemGetResponseDTO findItemById(long id) {
+        Item found = this.itemRepo.findById(id).orElseThrow();
+        double lng = found.getLocation().getX();
+        double lat = found.getLocation().getY();
+        return new ItemGetResponseDTO(found.getId(), found.getTitle(), found.getDescription(), found.getType(), found.getCategory(), found.getUser().getId(), found.getPics(), lng, lat);
     }
 
     public List<ItemGetResponseDTO> findAllByCategory(User user, Category category) {

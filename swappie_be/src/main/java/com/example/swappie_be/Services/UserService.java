@@ -48,12 +48,22 @@ public class UserService {
         else throw new NotFoundException(id);
     }
 
+    public UserGetResponseDTO findUserDetailsById(UUID id) {
+        User user = this.userRepo.findById(id).orElseThrow();
+        return new UserGetResponseDTO(user.getId(), user.getName(), user.getSurname(), user.getEmail(), user.getCity(), user.getProfilePic(), new LocationDTO(user.getLocation().getX(), user.getLocation().getY()));
+    }
+
+    public UUID returnID(String email) {
+        User user = this.userRepo.findByEmail(email).orElseThrow();
+        return user.getId();
+    }
+
     public UserGetResponseDTO findFlatUserById(UUID id) {
         Optional<User> op = this.userRepo.findById(id);
         if (op.isPresent()) {
             User user = op.get();
             LocationDTO flatPoint = new LocationDTO(user.getLocation().getX(), user.getLocation().getY());
-            UserGetResponseDTO flatUser = new UserGetResponseDTO(user.getName(), user.getSurname(), user.getEmail(), user.getCity(), user.getProfilePic(), flatPoint);
+            UserGetResponseDTO flatUser = new UserGetResponseDTO(user.getId(), user.getName(), user.getSurname(), user.getEmail(), user.getCity(), user.getProfilePic(), flatPoint);
             return flatUser;
         } else throw new NotFoundException(id);
     }

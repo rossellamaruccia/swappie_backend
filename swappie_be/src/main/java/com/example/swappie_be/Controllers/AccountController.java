@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -34,6 +35,12 @@ public class AccountController {
     public AccountController(UserService userService, Geometry geometry) {
         this.geometry = geometry;
         this.userService = userService;
+    }
+
+    @GetMapping("/details")
+    public UserGetResponseDTO getUserDetails(@AuthenticationPrincipal User user, @RequestParam(name = "id", required = false) String id) {
+        UUID userID = UUID.fromString(id);
+        return this.userService.findUserDetailsById(userID);
     }
 
     @GetMapping("/me")
