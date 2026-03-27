@@ -97,9 +97,13 @@ public class ItemService {
         } else throw new NotFoundException(user_id);
     }
 
-    public List<ItemGetResponseDTO> findAllItems(User user) {
-        List<Item> allItemsList = this.itemRepo.findAll();
-        List<ItemGetResponseDTO> allGetResponseItemsList = allItemsList.stream()
+    public List<ItemGetResponseDTO> findAllItems(User user, int radius) {
+        double userLon = user.getLocation().getX();
+        double userLat = user.getLocation().getY();
+
+        return this.itemRepo.findItemsWithinRadius(userLat, userLon, radius, user.getId())
+                .stream()
+                .filter(item -> !item.getUser().getId().equals(user.getId()))
                 .map(item -> new ItemGetResponseDTO(
                         item.getId(),
                         item.getTitle(),
@@ -111,10 +115,8 @@ public class ItemService {
                         item.getLocation().getX(),
                         item.getLocation().getY()
                 ))
-                .collect(Collectors.toCollection(ArrayList::new));
-        allGetResponseItemsList.removeIf((item -> user.getId().equals(item.user_id())));
-        return allGetResponseItemsList;// questa funzione deve ritornare tutti gli item tranne quelli dell'user che fa la richiesta
-    }
+                .collect(Collectors.toList());
+    }// questa funzione deve ritornare tutti gli item tranne quelli dell'user che fa la richiesta
 
     public ItemGetResponseDTO findItemById(long id) {
         Item found = this.itemRepo.findById(id).orElseThrow();
@@ -123,8 +125,13 @@ public class ItemService {
         return new ItemGetResponseDTO(found.getId(), found.getTitle(), found.getDescription(), found.getType(), found.getCategory(), found.getUser().getId(), found.getPics(), lng, lat);
     }
 
-    public List<ItemGetResponseDTO> findAllByCategory(User user, Category category) {
-        return this.itemRepo.findAvailableItemsByCategory(user.getId(), category).stream()
+    public List<ItemGetResponseDTO> findAllByCategory(User user, Category category, int radius) {
+        double userLon = user.getLocation().getX();
+        double userLat = user.getLocation().getY();
+
+        return this.itemRepo.findItemsWithinRadius(userLat, userLon, radius, user.getId())
+                .stream()
+                .filter(item -> item.getCategory() == category)
                 .map(item -> new ItemGetResponseDTO(
                         item.getId(),
                         item.getTitle(),

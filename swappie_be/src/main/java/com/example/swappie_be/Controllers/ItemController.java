@@ -59,13 +59,15 @@ public class ItemController {
         return itemService.findItemById(itemID);
     }
 
+    //TODO: aggiungere parametro che passa la distanza massima con cui filtrare i risultati di questa GET
     @GetMapping("/feed")
     public List<ItemGetResponseDTO> findAllItems(@AuthenticationPrincipal User user,
+                                                 @RequestParam(name = "radius", required = false) int radius,
                                                  @RequestParam(name = "category", required = false) Category category) {
         if (category != null) {
-            return itemService.findAllByCategory(user, category);
+            return itemService.findAllByCategory(user, category, radius);
         } else {
-            return itemService.findAllItems(user);
+            return itemService.findAllItems(user, radius);
         }
     }
 
