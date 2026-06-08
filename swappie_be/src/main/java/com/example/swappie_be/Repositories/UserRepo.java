@@ -13,6 +13,7 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepo extends JpaRepository<User, UUID> {
+
     Optional<User> findByEmail(String email);
 
     @Query(value = "SELECT * FROM users u WHERE ST_DWithin(u.location, :currentLocation, :distance)",

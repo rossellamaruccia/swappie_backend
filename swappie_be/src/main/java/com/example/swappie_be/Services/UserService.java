@@ -2,6 +2,7 @@ package com.example.swappie_be.Services;
 
 import com.cloudinary.utils.ObjectUtils;
 import com.example.swappie_be.Entities.User;
+import com.example.swappie_be.Exceptions.BadRequestException;
 import com.example.swappie_be.Exceptions.NotFoundException;
 import com.example.swappie_be.Payloads.LocationDTO;
 import com.example.swappie_be.Payloads.UserDTO;
@@ -37,6 +38,9 @@ public class UserService {
     }
 
     public void save(UserDTO payload, Point userPoint) {
+        if (this.userRepo.findByEmail(payload.email()).isPresent()) {
+            throw new BadRequestException("Email already exists");
+        }
         User newUser = new User(payload.name(), payload.surname(), payload.email(), passwordEncoder.encode(payload.password()), payload.city());
         newUser.setLocation(userPoint);
         this.userRepo.save(newUser);

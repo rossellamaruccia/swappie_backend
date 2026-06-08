@@ -29,6 +29,7 @@ public class User implements UserDetails {
     private UUID id;
     private String name;
     private String surname;
+    @Column(unique = true, nullable = false)
     private String email;
     @JsonIgnore
     private String password;
@@ -54,6 +55,26 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return "";
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

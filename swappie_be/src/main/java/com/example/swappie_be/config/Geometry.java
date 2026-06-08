@@ -17,6 +17,4 @@ public class Geometry {
         Point point = geometryFactory().createPoint(new Coordinate(longitude, latitude));
         return point;
     }
-
-
 }
