@@ -50,12 +50,12 @@ public class UserService {
 
     public UserGetResponseDTO findUserDetailsById(UUID id) {
         User user = this.userRepo.findById(id).orElseThrow();
-        return new UserGetResponseDTO(user.getId(), user.getName(), user.getSurname(), user.getEmail(), user.getCity(), user.getProfilePic(), new LocationDTO(user.getLocation().getX(), user.getLocation().getY()));
+        return new UserGetResponseDTO(user.getUser_id(), user.getName(), user.getSurname(), user.getEmail(), user.getCity(), user.getProfilePic(), new LocationDTO(user.getLocation().getX(), user.getLocation().getY()));
     }
 
     public UUID returnID(String email) {
         User user = this.userRepo.findByEmail(email).orElseThrow();
-        return user.getId();
+        return user.getUser_id();
     }
 
     public UserGetResponseDTO findFlatUserById(UUID id) {
@@ -63,7 +63,7 @@ public class UserService {
         if (op.isPresent()) {
             User user = op.get();
             LocationDTO flatPoint = new LocationDTO(user.getLocation().getX(), user.getLocation().getY());
-            UserGetResponseDTO flatUser = new UserGetResponseDTO(user.getId(), user.getName(), user.getSurname(), user.getEmail(), user.getCity(), user.getProfilePic(), flatPoint);
+            UserGetResponseDTO flatUser = new UserGetResponseDTO(user.getUser_id(), user.getName(), user.getSurname(), user.getEmail(), user.getCity(), user.getProfilePic(), flatPoint);
             return flatUser;
         } else throw new NotFoundException(id);
     }
@@ -107,13 +107,13 @@ public class UserService {
     }
 
     public void findByIdAndSetLocation(User user, Point userPoint) {
-        Optional<User> op = this.userRepo.findById(user.getId());
+        Optional<User> op = this.userRepo.findById(user.getUser_id());
         try {
             if (op.isPresent()) {
                 User found = op.get();
                 found.setLocation(userPoint);
                 this.userRepo.save(found);
-            } else throw new NotFoundException(user.getId());
+            } else throw new NotFoundException(user.getUser_id());
         } catch (Exception e) {
             throw new RuntimeException("Failed to update your location", e);
         }

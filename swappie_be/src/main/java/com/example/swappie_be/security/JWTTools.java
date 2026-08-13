@@ -22,7 +22,7 @@ public class JWTTools {
         return Jwts.builder()
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                .subject(String.valueOf(user.getId()))
+                .subject(String.valueOf(user.getUser_id()))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
     }
@@ -33,7 +33,7 @@ public class JWTTools {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-            
+
             return UUID.fromString(claims.getSubject());
         } catch (Exception e) {
             throw new NotFoundException("User not found or token invalid");
