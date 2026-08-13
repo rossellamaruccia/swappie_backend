@@ -48,7 +48,7 @@ public class AccountController {
         if (user == null) {
             throw new UnauthorizedException("Log in again");
         } else {
-            return this.userService.findFlatUserById(user.getId());
+            return this.userService.findFlatUserById(user.getUser_id());
         }
     }
 
@@ -63,7 +63,7 @@ public class AccountController {
         }
         if (user == null) {
             throw new UnauthorizedException("Log in again");
-        } else this.userService.findByIdAndUpdate(user.getId(), payload);
+        } else this.userService.findByIdAndUpdate(user.getUser_id(), payload);
     }
 
 
@@ -74,7 +74,7 @@ public class AccountController {
         }
         if (profilePic.isEmpty()) {
             throw new ValidationException(List.of("Profile picture cannot be empty"));
-        } else return this.userService.findByIdAndUpdateProfilePic(user.getId(), profilePic);
+        } else return this.userService.findByIdAndUpdateProfilePic(user.getUser_id(), profilePic);
     }
 
     @PutMapping("/me/edit/location")

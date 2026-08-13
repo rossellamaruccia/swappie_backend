@@ -14,10 +14,10 @@ import java.util.UUID;
 @Repository
 public interface ItemRepo extends JpaRepository<Item, Long> {
 
-    Optional<ArrayList<Item>> findAllByUserId(UUID user_id);
+    Optional<ArrayList<Item>> findAllByUser(UUID user_id);
 
     @Query(value = "SELECT * FROM items i " +
             "WHERE ST_DWithin(i.location, ST_MakePoint(:lon, :lat)::geography, :radius * 1000) " +
-            "AND i.user_id != :userId", nativeQuery = true)
-    List<Item> findItemsWithinRadius(double lat, double lon, @Param("radius") int radius, @Param("userId") UUID userId);
+            "AND i.user != :user", nativeQuery = true)
+    List<Item> findItemsWithinRadius(double lat, double lon, @Param("radius") int radius, @Param("user") UUID user);
 }

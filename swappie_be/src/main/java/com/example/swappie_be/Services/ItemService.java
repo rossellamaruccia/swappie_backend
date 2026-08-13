@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
-    private ItemRepo itemRepo;
-    private CloudinaryConfig cloudinaryConfig;
+    private final ItemRepo itemRepo;
+    private final CloudinaryConfig cloudinaryConfig;
 
     @Autowired
     public ItemService(ItemRepo itemRepo, CloudinaryConfig cloudinaryConfig) {
@@ -63,7 +63,7 @@ public class ItemService {
                 }
             }
             Item item = this.itemRepo.findById(itemID).orElseThrow();
-            if (item.getUser().getId().equals(userID)) {
+            if (item.getUser().getUser_id().equals(userID)) {
                 item.setTitle(payload.title());
                 item.setDescription(payload.description());
                 item.setType(payload.itemType());
@@ -78,17 +78,17 @@ public class ItemService {
     }
 
     public ArrayList<ItemGetResponseDTO> findItemsPerUserId(UUID user_id) {
-        Optional<ArrayList<Item>> optional = this.itemRepo.findAllByUserId(user_id);
+        Optional<ArrayList<Item>> optional = this.itemRepo.findAllByUser(user_id);
         if (optional.isPresent()) {
             ArrayList<Item> array = optional.get();
             return array.stream()
                     .map(item -> new ItemGetResponseDTO(
-                            item.getId(),
+                            item.getItem_id(),
                             item.getTitle(),
                             item.getDescription(),
                             item.getType(),
                             item.getCategory(),
-                            item.getUser().getId(),
+                            item.getUser().getUser_id(),
                             item.getPics(),
                             item.getLocation().getX(),
                             item.getLocation().getY()
@@ -101,16 +101,16 @@ public class ItemService {
         double userLon = user.getLocation().getX();
         double userLat = user.getLocation().getY();
 
-        return this.itemRepo.findItemsWithinRadius(userLat, userLon, radius, user.getId())
+        return this.itemRepo.findItemsWithinRadius(userLat, userLon, radius, user.getUser_id())
                 .stream()
-                .filter(item -> !item.getUser().getId().equals(user.getId()))
+                .filter(item -> !item.getUser().getUser_id().equals(user.getUser_id()))
                 .map(item -> new ItemGetResponseDTO(
-                        item.getId(),
+                        item.getItem_id(),
                         item.getTitle(),
                         item.getDescription(),
                         item.getType(),
                         item.getCategory(),
-                        item.getUser().getId(),
+                        item.getUser().getUser_id(),
                         item.getPics(),
                         item.getLocation().getX(),
                         item.getLocation().getY()
@@ -122,23 +122,23 @@ public class ItemService {
         Item found = this.itemRepo.findById(id).orElseThrow();
         double lng = found.getLocation().getX();
         double lat = found.getLocation().getY();
-        return new ItemGetResponseDTO(found.getId(), found.getTitle(), found.getDescription(), found.getType(), found.getCategory(), found.getUser().getId(), found.getPics(), lng, lat);
+        return new ItemGetResponseDTO(found.getItem_id(), found.getTitle(), found.getDescription(), found.getType(), found.getCategory(), found.getUser().getUser_id(), found.getPics(), lng, lat);
     }
 
     public List<ItemGetResponseDTO> findAllByCategory(User user, Category category, int radius) {
         double userLon = user.getLocation().getX();
         double userLat = user.getLocation().getY();
 
-        return this.itemRepo.findItemsWithinRadius(userLat, userLon, radius, user.getId())
+        return this.itemRepo.findItemsWithinRadius(userLat, userLon, radius, user.getUser_id())
                 .stream()
                 .filter(item -> item.getCategory() == category)
                 .map(item -> new ItemGetResponseDTO(
-                        item.getId(),
+                        item.getItem_id(),
                         item.getTitle(),
                         item.getDescription(),
                         item.getType(),
                         item.getCategory(),
-                        item.getUser().getId(),
+                        item.getUser().getUser_id(),
                         item.getPics(),
                         item.getLocation().getX(),
                         item.getLocation().getY()

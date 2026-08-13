@@ -51,7 +51,7 @@ public class ItemController {
 
     @GetMapping("")
     public ArrayList<ItemGetResponseDTO> getItemsPerUser(@AuthenticationPrincipal User user) {
-        return this.itemService.findItemsPerUserId(user.getId());
+        return this.itemService.findItemsPerUserId(user.getUser_id());
     }
 
     @GetMapping("/details")
@@ -89,6 +89,6 @@ public class ItemController {
             throw new UnauthorizedException("Log in again");
         }
 
-        this.itemService.editItem(payload, itemID, user.getId(), files);
+        this.itemService.editItem(payload, itemID, user.getUser_id(), files);
     }
 }
